@@ -1,6 +1,6 @@
 # npdb
 
-npdb is a database and manipulation language for NumPy ndarrays. It enables the persistent storage of large n-dimensional arrays on disk and offers tools for drawing segments of data into memory for processing.
+npdb is an implementation of NumPy-compatible large n-dimenstional arrays stored on disk that may not fit in memory. npdb implements the core multi-dimensional array class `npdb.dbarray`, which provides persistent storage and segmented in-memory operations. `np.dbarray` types support a subset of the `numpy.ndarray` interface.
 
 ## Background
 
