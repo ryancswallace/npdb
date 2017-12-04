@@ -1,6 +1,6 @@
 # npdb
 
-npdb is an implementation of NumPy-compatible large n-dimenstional arrays stored on disk that may not fit in memory. npdb implements the core multi-dimensional array class `npdb.dbarray`, which provides persistent storage and segmented in-memory operations. `np.dbarray` types support a subset of the `numpy.ndarray` interface.
+npdb is an implementation of large disk-stored NumPy-compatible n-dimenstional arrays that may exceed available memory. npdb implements the core multi-dimensional array class `npdb.dbarray`, which supports persistent storage and parallelized batch processed operations. `np.dbarray` types support a subset of the `numpy.ndarray` interface.
 
 ## Background
 
