@@ -1,8 +1,17 @@
 ## IN DEV
-TODO: how to extend from different package dir?
+TODO: 
+---infrastruture---
+testing
+Sphinx
+packaging
+
+---core content---
+starndardize terminology for sliceing/indexing, rename instances, attributes
+rewrite arraymap, indexing in Cython?
 free dbarray? need to save explicitly, or paramater for persistence?
-Set up Sphinx
-Set up packaging
+Keep track of what's in memory to avoid repetitive pulls
+Combine flattened bounds
+Don't create dbindex objects?
 
 # npdb
 

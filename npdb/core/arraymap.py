@@ -1,3 +1,7 @@
+"""
+Implements a memory map 
+"""
+
 import os
 
 import numpy as np
@@ -13,26 +17,39 @@ class arraymap(object):
         the array. 
         """
         # root_dir = 
+        # n_files = 
         # file_ext = ".dat"
         # dsize = # bytes per dtype value
+        # file_path = {filenum: "" for filenum in range(n_files)}
         pass
 
-    def idx_to_loc(self, start_idx, end_idx):
+    def __repr__(self):
+        pass
+
+    def idxs_to_locs(self, flattened_bounds):
         """
         Returns list of (filenum, offset) tuples within the file corresponding to thhe data
         between start_idx and end_idx
         """
+        
+
         filenum = 0
         offset = 0
+
+
+        flattened_locs_nested = [self.idx_to_loc(start_idx, end_idx) for start_idx, end_idx in flattened_bounds]
+        flattened_locs = [loc for nested in flattened_locs_nested for loc in nested]
+
 
         return [filenum, offset]
 
     def pull(self, flattened_bounds, shape):
         """
+        TODO: check for adjacent blocks
         Returns ndarray corresponding to the specified bounds.
         """
-        flattened_locs_nested = [self.idx_to_loc(start_idx, end_idx) for start_idx, end_idx in flattened_bounds]
-        flattened_locs = [loc for nested in flattened_locs_nested for loc in nested]
+        # contiguous blocks described by (filenum, offset) ranges
+        flattened_locs = idxs_to_locs(flattened_bounds)
 
         pulled = np.empty(shape, dtype=self.dtype)
 
@@ -47,7 +64,7 @@ class arraymap(object):
                 # close previous file
                 last_fp.close()
                 # open new file
-                fp = open(os.path.join(self.root_dir, filenum + self.file_ext), "rb")
+                fp = open(os.path.join(self.root_dir, self.filepaths[filenum]), "rb")
                 last_fp = fp
 
             block_length = end_offset - start_offset
@@ -61,8 +78,29 @@ class arraymap(object):
             
         return pulled
 
-    def push(self, ndarray, flattened_bounds):
+    def push(self, ndview):
         """
         Writes ndarray to disk at location specified by bounds.
         """
-        pass
+        ndarray = ndview.asndarray()
+        arrslice, flattened_bounds
+
+        flattened_locs = idxs_to_locs(flattened_bounds)
+
+        last_filenum, last_fp = None, None
+        for (start_filenum, start_offset), (end_filenum, end_offset) in flattened_locs:
+            filenum = start_filenum
+            if last_filenum == filenum:
+                # file is already open
+                fp = last_fp
+            else:
+                # close previous file
+                last_fp.close()
+                # open new file
+                fp = open(os.path.join(self.root_dir, self.filepaths[filenum]), "wb")
+                last_fp = fp
+
+
+            fp.seek(start_offset)
+
+        

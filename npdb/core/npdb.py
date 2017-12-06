@@ -11,6 +11,7 @@ import itertools
 
 import numpy as np
 
+import indexing
 import arraymap as am
 
 class dbarray(object):
@@ -41,29 +42,30 @@ class dbarray(object):
         """
         return self.shape[0]
 
-    def __getitem__(self, slc):
+    def __getitem__(self, idx):
         """
         Overload access indexing.
         """
-        arrslice = dbindex(slc)
-        return self.read(arrslice)
+        bounds = indexing.index(self.shape, idx)
+        return bounds
+        # return self.read(arrslice)
 
-    def __setitem__(self, slc, ndview):
+    def __setitem__(self, idx, ndview):
         """
         Overload assignment indexing.
         """
-        arrslice = dbindex(slc)
-        view = ndview(ndview.asndarray(), ndview.dbarray, arrslice=arrslice)
+        arrslice = indexing.index(self.shape, idx)
+        # view = ndview(ndview.asndarray(), ndview.dbarray, arrslice=arrslice)
 
-        self.flush(view)
+        # self.flush(view)
 
     def read(self, arrslice=None):
         """
         Returns (in-memory) ndview object corresponding to dbarray[arrslice].
         """
         # read data from disk contained in bounding indices
-        flattened_bounds = dbindex.flattened_bounds(arrslice)
-        shape = dbindex.shape(arrslice)
+        flattened_bounds = indexing.dbindex.flattened_bounds(arrslice)
+        shape = indexing.dbindex.shape(arrslice)
         data = self.am.pull(flattened_bounds, shape)
         
         # create ndview
@@ -76,13 +78,12 @@ class dbarray(object):
         Pushes data in ndview to dbarray on disk.
         """
         # convert arrslice to flattened bounds
-        flattened_bounds = dbindex.flattened_bounds(arrslice, self)
+        # flattened_bounds = dbindex.flattened_bounds(arrslice, self)
 
         # map copies ndarray to disk
-        self.am.push(ndview.asndarray(), flattened_bounds)
+        self.am.push(ndview)
 
-    @staticmethod
-    def asndarray(self, dbarray, copy):
+    def asndarray(self, copy):
         """
         Returns view of entire dbarray as ndarray object.
         """
@@ -93,7 +94,8 @@ class ndview(np.ndarray):
     def __new__(cls, data, dbarray, arrslice=None):
         """
         Describes a "view" into a subset of a dbarray. Inherits from np.ndarray; 
-        additional parameters locate the view in containing dbarray.
+        additional parameters locate the view in containing dbarray. The position of
+        an ndview in a dbarray is described by its dbindex object arrslice.
         """
         obj = np.asarray(data).view(cls)
         
@@ -123,18 +125,18 @@ class ndview(np.ndarray):
 
     def asndarray(self, copy=False):
         """
-        Casts ndview as an np.ndarray, obliterating bounds. If copy, data are copied and
+        Casts ndview as an np.ndarray, obliterating arrslice context. If copy, data are copied and
         pointer to new ndarray object is returned; otherwise, points to original ndview memory. 
         """
         if copy:
             arr = np.array(self)
-        else: 
+        else:
             arr = np.asarray(self)
 
         return arr 
 
     @staticmethod
-    def merge(self, ndviews, fill=0):
+    def merge(ndviews, fill=0):
         """
         Uses ndview positions to merge multiple ndview objects into a single new ndview object.
 
@@ -209,8 +211,26 @@ class ndview(np.ndarray):
 
 
 
-db = dbarray((3,3,3), float, "file")
-s = db[2,2:]
+db = dbarray((3,3,3), float)
+bounds = db[0:3]
+print "bounds", bounds
+
+db = dbarray((10,), float)
+bounds = db[2:5]
+print "bounds", bounds
+
+bounds = db[:-7]
+print "bounds", bounds
+
+bounds = db[1:7:2]
+print "bounds", bounds
+
+db = dbarray((5,7), float)
+bounds = db[1:5:2,::3]
+print "bounds", bounds
+
+bounds = db[...,1]
+print "bounds", bounds
 
 # a = ndview(np.zeros(shape=(3,3)), db, dims=(0,1), offset=(0,0,0))
 # b = ndview(np.ones(shape=(2,2)), db, dims=(0,1), offset=(1,0,0))
