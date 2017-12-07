@@ -26,7 +26,8 @@ The `numpy.memmap` class also supports arrays stored on disk, but has several li
 The npdb library strikes a different balance--array sizes are constrained only by available disk space and can be distributed across multiple disks. The cost of this capability is that a limited subset of the numpy interface is supported.
 
 ## Example
-```
+
+```python
 import npdb as nd
 
 # create on disk a 3D array of floats of lengths 100
@@ -37,13 +38,15 @@ db_arr = npdb.dbarray((100,100,100), float)
 ```
 
 ## Installation
-You can install npdb using pip by running 
+You can install npdb using pip by running
+
 ```
 $ pip install npdb
 ```
 
 ## Testing
 If unittest is installed, tests can be run after installation with
+
 ```
 $ python -m unittest discover
 ```
