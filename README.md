@@ -37,11 +37,15 @@ db_arr = npdb.dbarray((100,100,100), float)
 ```
 
 ## Installation
+You can install npdb using pip by running 
+```
+$ pip install npdb
+```
 
 ## Testing
 If unittest is installed, tests can be run after installation with
 ```
-python -m unittest discover
+$ python -m unittest discover
 ```
 
 ## License
