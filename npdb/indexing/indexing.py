@@ -1,5 +1,6 @@
 """
-Implements indexing on a dbarray.
+Implements indexing on a dbarray. dbarray indexing maps a raw bracket index to
+a set of maximal C-contiguous simple index bounds containing the indexed data.
 
 The dbindx an index of a dbarray. A dbindex is created from either a bracketed 
 expression, i.e., dbarray[raw_idx], or from explicit dbindex creation functions.
