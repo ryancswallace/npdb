@@ -244,9 +244,9 @@ def simple_index(db_shape, idx):
                     stop = positivize_idx(db_shape[0], stop)
                     first_axis_idxs = range(start, stop, step)
                     for first_idx in first_axis_idxs:
-                        index_bounds += [((first_idx,) + start_idx, (first_idx,) + 
-                                   end_idx) for start_idx, end_idx in 
-                                   sub_bounds]
+                        index_bounds += [((first_idx,) + start_idx, (first_idx,)
+                                         + end_idx) for start_idx, end_idx in 
+                                         sub_bounds]
                     return index_bounds
 
     else:

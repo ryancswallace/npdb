@@ -127,10 +127,46 @@ class arraymap(object):
 
         return filnum, offset
 
+    def split_by_filenum(self, address_bounds):
+        """
+        Converts bounds that span multiple files into multiple bounds within
+        single files.
+
+        Args:
+            address_bounds (list): a list of starting and ending address tuples.
+
+        Returns:
+            split_address_bounds (list): bounds equivalent to address_bounds,
+            but with no single bound spanning multiple filenums.
+        """
+        for i in range(len(address_bounds)):
+            (filenum_start, offset_start), (filenum_stop, offset_stop) = \
+                address_bounds[i]
+            if filenum_start != filenum_stop:
+                # replace single bounds by split bounds
+                del address_bounds
+
+                # add first file to end
+                first_file = ((filenum_start, offset_start), (filenum_start, 
+                              self.bytes_per_file[filenum_start] - 1))
+                address_bounds.insert(i, first_file)
+
+                # add all of intermediate files
+                complete_filenums = range(filenum_start + 1, filenum_stop)
+                for j, filenum in enumerate(complete_filenums):
+                    complete_file = ((filenum, 0), (filenum, self.bytes_per_file
+                                     [filenum] - 1))
+                    address_bounds.insert(i + j + 1, complete_file)
+
+                # add last file to stopping offset
+                last_file = ((filenum_stop, 0), (filenum_stop, offset_stop))
+                address_bounds.insert(i + len(complete_filenums) + 1, last_file)
+
+        return address_bounds
+
     def get_addresses(self, index_bounds):
         """
-        Returns the file addresses of the data corresponding to 
-        index_bounds.
+        Returns the file addresses of the data corresponding to index_bounds.
 
         A single address takes the form of a tuple of (filenum, offset) tuples 
         such that a maximal C-contiguous segment of selected data exists between
@@ -141,44 +177,49 @@ class arraymap(object):
             C-contiguous block of data to be selected.
 
         Returns:
-            address_bounds (list): a list of starting and ending address tuples.
+            address_bounds_split (list): a list of starting and ending address 
+            tuples, none of which span multiple files.
         """
         address_bounds = [(index_to_address(start), index_to_address(stop)) for
                           start, stop in index_bounds]
+        address_bounds_split = split_by_filenum(address_bounds)
 
-        return address_bounds
+        return address_bounds_split
 
     def pull(self, index_bounds, shape):
         """
-        Returns ndarray corresponding to the specified bounds.
+        Retrieves from disk dbarray elements in index_bounds.
+
+        Args:
+            index_bounds (list): a list of bounding index tuples of each maximal
+            C-contiguous block of data to be selected.
+            shape (tuple): shape of resulting ndarray being indexed.
+
+        Returns:
+            pulled (numpy.ndarray): ndarray elements in index_bounds.
         """
         # contiguous blocks described by (filenum, offset) ranges
-        flattened_locs = get_addresses(index_bounds)
+        address_bounds = get_addresses(index_bounds)
 
-        pulled = np.empty(shape, dtype=self.dtype)
-
-        unraveled_start, unraveled_end = 0, 0
         last_filenum, last_fp = None, None
-        for (start_filenum, start_offset), (end_filenum, end_offset) in flattened_locs:
-            filenum = start_filenum
-            if last_filenum == filenum:
+        for (filenum, offset_start), (_, offset_stop) in address_bounds:
+            if filenum == last_filenum:
                 # file is already open
                 fp = last_fp
             else:
                 # close previous file
                 last_fp.close()
                 # open new file
-                fp = open(os.path.join(self.root_dir, self.file_paths[filenum]), "rb")
+                fp = open(self.file_paths[filenum], "rb")
                 last_fp = fp
 
-            block_length = end_offset - start_offset
-            unraveled_start = unraveled_end
-            unraveled_end = unraveled_start + block_length
-
             # read between starting offset and ending offset
-            fp.seek(start_offset)
-            vals = fp.read(block_length)
-            np.put(pulled, range(unraveled_start, unraveled_end), vals)
+            read_length = offset_stop - offset_start
+            fp.seek(offset_start)
+            vals = np.fromfile(fp, dtype=self.dtype, count=read_length, sep='')
+            
+            # reshape data - no copying here
+            np.reshape(pulled, shape)
             
         return pulled
 
