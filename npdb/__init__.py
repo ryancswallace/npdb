@@ -22,42 +22,44 @@ import numpy as np
 ################
 ### User API ###
 ################
-### sub-packages into top level namespace
-from npdb import core
-from npdb import creation
-from npdb import linalg
-from npdb import math
-from npdb import random
-from npdb import sorting
-from npdb import statistics
+### core modules and classes
+import npdb.core
+import npdb.creation
+import npdb.indexing
+import npdb.linalg
+import npdb.math
+import npdb.random
+import npdb.sorting
+import npdb.statistics
 
-from npdb.core import npdb 
+from npdb.core import npdb
+from npdb.core.npdb import dbarray
 
 #### array creation routines
-from npdb.creation.basic import empty
-from npdb.creation.basic import empty_like
-from npdb.creation.basic import eye
-from npdb.creation.basic import full
-from npdb.creation.basic import full_like
-from npdb.creation.basic import identity
-from npdb.creation.basic import ones
-from npdb.creation.basic import ones_like
-from npdb.creation.basic import zeros
-from npdb.creation.basic import zeros_like
+# from npdb.creation.basic import empty
+# from npdb.creation.basic import empty_like
+# from npdb.creation.basic import eye
+# from npdb.creation.basic import full
+# from npdb.creation.basic import full_like
+# from npdb.creation.basic import identity
+# from npdb.creation.basic import ones
+# from npdb.creation.basic import ones_like
+# from npdb.creation.basic import zeros
+# from npdb.creation.basic import zeros_like
 
-from npdb.creation.from_data import array
-from npdb.creation.from_data import asanyarray
-from npdb.creation.from_data import asarray
+# from npdb.creation.from_data import array
+# from npdb.creation.from_data import asanyarray
+# from npdb.creation.from_data import asarray
 
-from npdb.creation.ranges import arange
-from npdb.creation.ranges import linspace
-from npdb.creation.ranges import logspace
-from npdb.creation.ranges import meshgrid
-from npdb.creation.ranges import mgrid
-from npdb.creation.ranges import ogrid
+# from npdb.creation.ranges import arange
+# from npdb.creation.ranges import linspace
+# from npdb.creation.ranges import logspace
+# from npdb.creation.ranges import meshgrid
+# from npdb.creation.ranges import mgrid
+# from npdb.creation.ranges import ogrid
 
-from npdb.creation.matrix import diag
-from npdb.creation.matrix import diagflat
+# from npdb.creation.matrix import diag
+# from npdb.creation.matrix import diagflat
 
 ### array manipulation
 # from npdb.manipulation.basic import copyto

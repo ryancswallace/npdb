@@ -11,7 +11,7 @@ import itertools
 
 import numpy as np
 
-import indexing
+# from indexing import indexing
 import arraymap as am
 
 class dbarray(object):
@@ -39,8 +39,8 @@ class dbarray(object):
         self.max_file_size = max_file_size
 
         # allocate disk space and map array contents to disk space 
-        try:
-            self.arrmap = am.arraymap(shape, dtype, data_dir, max_file_size)
+        try: 
+            self.arrmap = am.arraymap(shape, dtype, byteorder, order, data_dir, max_file_size)
         except Exception as e:
             print "Disk allocation failed.", e
             sys.exit(e)
@@ -58,7 +58,7 @@ class dbarray(object):
         """
         Overload access indexing.
         """
-        bounds = indexing.index(self.shape, idx)
+        bounds = indexing.unravel_index(self.shape, idx)
         return bounds
         # return self.read(arrslice)
 
@@ -66,7 +66,7 @@ class dbarray(object):
         """
         Overload assignment indexing.
         """
-        arrslice = indexing.index(self.shape, idx)
+        arrslice = indexing.unravel_index(self.shape, idx)
         # view = dbview(dbview.asndarray(), dbview.dbarray, arrslice=arrslice)
 
         # self.flush(view)
@@ -76,9 +76,8 @@ class dbarray(object):
         Returns (in-memory) dbview object corresponding to dbarray[arrslice].
         """
         # read data from disk contained in bounding indices
-        flattened_bounds = indexing.dbindex.flattened_bounds(arrslice)
-        shape = indexing.dbindex.shape(arrslice)
-        data = self.am.pull(flattened_bounds, shape)
+        index_bounds, indexed_shape = indexing.unravel_index(self.shape, idx)
+        data = self.am.pull(index_bounds, indexed_shape)
         
         # create dbview
         view = dbview(data, self, arrslice)

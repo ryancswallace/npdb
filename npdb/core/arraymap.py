@@ -4,6 +4,7 @@ Implements a memory map of a dbarray on disk.
 
 import os
 import math
+import operator
 
 import numpy as np
 
@@ -34,8 +35,9 @@ class arraymap(object):
         self.max_file_size = max_file_size
 
         # create directory and file structure
-        self.file_paths, self.bytes_per_file, self.array_dir_name = setup_dirs(
-            data_dir, self.size, self.itemsize, self.max_file_size)
+        self.file_paths, self.bytes_per_file, self.array_dir_name = (
+            self.setup_dirs(data_dir, self.size, self.itemsize, 
+                            self.max_file_size))
         self.n_files = len(self.file_paths)
 
         # cache potentially repeatedly used calculations
@@ -44,7 +46,7 @@ class arraymap(object):
     def __repr__(self):
         return "arraymap " + self.array_dir_name
 
-    def setup_dirs(data_dir, size, itemsize, max_file_size):
+    def setup_dirs(self, data_dir, size, itemsize, max_file_size):
         """
         Creates directory to contain array data and files to contain array 
         buffers
@@ -201,6 +203,7 @@ class arraymap(object):
         # contiguous blocks described by (filenum, offset) ranges
         address_bounds = get_addresses(index_bounds)
 
+        pulled = np.empty((0), dtype=self.dtype)
         last_filenum, last_fp = None, None
         for (filenum, offset_start), (_, offset_stop) in address_bounds:
             if filenum == last_filenum:
@@ -216,16 +219,18 @@ class arraymap(object):
             # read between starting offset and ending offset
             read_length = offset_stop - offset_start
             fp.seek(offset_start)
-            vals = np.fromfile(fp, dtype=self.dtype, count=read_length, sep='')
+
+            np.append(pulled, np.fromfile(fp, dtype=self.dtype, 
+                                          count=read_length, sep=''))
             
-            # reshape data - no copying here
-            np.reshape(pulled, shape)
+        # reshape data - no copying here
+        np.reshape(pulled, shape)
             
         return pulled
 
-    def push(self, dbview):
+    def push(self, index_bounds, arr):
         """
-        Writes ndarray to disk at location specified by bounds.
+        Writes ndarray to disk at location specified by index bounds.
         """
         ndarray = dbview.asndarray()
         arrslice, index_bounds
@@ -247,33 +252,4 @@ class arraymap(object):
 
 
             fp.seek(start_offset)
-
-
-
-
-
-print "here"
-index_bounds = [((0,0),(0,1)),((1,1),(1,2)),((1,2),(3,4)),((0,1),(0,0))]
-print maximize(index_bounds)
-
-
-index_bounds = [((0,0),(0,0)),((1,1),(1,2)),((2,2),(3,4)),((0,1),(0,0))]
-print maximize(index_bounds)
-
-
-index_bounds = [((0,0),(0,1)),((1,1),(1,2)),((2,2),(0,1)),((0,1),(0,0))]
-print maximize(index_bounds)
-
-
-index_bounds = [((0,0),(0,1)),((0,1),(1,2)),((1,2),(0,1)),((0,1),(0,0))]
-print maximize(index_bounds)
-
-
-index_bounds = [((0,0),(0,0)),((0,1),(1,2)),((1,2),(0,1)),((0,1),(0,0))]
-print maximize(index_bounds)
-
-
-index_bounds = [((0,0),(1,1)),((1,1),(2,2)),((2,2),(3,3)),((3,3),(3,3))]
-print maximize(index_bounds)
-
 

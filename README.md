@@ -39,6 +39,10 @@ db_arr = npdb.dbarray((100,100,100), float)
 ## Installation
 
 ## Testing
+If unittest is installed, tests can be run after installation with
+```
+python -m unittest discover
+```
 
 ## License
 MIT License (see `LICENSE`). Copyright (c) 2017 Ryan Wallace.
