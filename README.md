@@ -1,19 +1,20 @@
 # IN DEV
 TODO: 
+
 ---infrastruture---
-imports into top namespace
-testing
-Sphinx
-packaging
+
+* imports into top namespace
+* testing
+* Sphinx
+* packaging
+
 
 ---core content---
-creation
-* basic - npdb.empty()
-* from data - npdb.array()
-rewrite arraymap and indexing in Cython/C/numpy?
-free dbarray? parameter to save explicitly, or paramater for persistence?
-keep track of what's in memory to avoid repetitive pulls
-compression
+* creation: basic - npdb.empty(), from data - npdb.array()
+* rewrite arraymap and indexing in Cython/C/numpy?
+* free dbarray? parameter to save explicitly, or paramater for persistence?
+* keep track of what's in memory to avoid repetitive pulls
+* compression
 
 # npdb
 
