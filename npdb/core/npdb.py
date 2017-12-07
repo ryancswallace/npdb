@@ -1,5 +1,5 @@
 """
-Two core npdb classes: 
+Contains the two core npdb classes: 
     1) dbarray, an ndarray-like object stored on disk, and
     2) dbview, a subclass of ndarray that corresponds to a subsection
     of a dbarray
@@ -16,19 +16,31 @@ import arraymap as am
 
 class dbarray(object):
     """
-    Implements a ndarray-like object with data stored on disk, not memory. Data size
-    is only constrained by available space on disk.
+    Implements a ndarray-like object with data stored on disk, not memory. Data
+    size is only constrained by available space on disk.
     """
-    def __init__(self, shape, dtype, data_dir=None, max_chunk_size=None):
+    def __init__(self, shape, dtype, byteorder="big_endian", 
+                 order="C", data_dir=None, max_file_size=None):
         # size attributes
-        self.shape = tuple(shape)
+        if type(shape) is int:
+            # convert to length 1 tuple
+            self.shape = (shape,)
+        else:
+            self.shape = tuple(shape)
         self.size = reduce(operator.mul, self.shape)
         self.ndim = len(shape)
-        self.max_chunk_size = max_chunk_size
+
+        self.dtype = np.dtype(dtype)
+        self.itemsize = self.dtype.itemsize
+
+        self.byteorder = byteorder
+        self.order = order
+
+        self.max_file_size = max_file_size
 
         # allocate disk space and map array contents to disk space 
         try:
-            self.arrmap = am.arraymap(shape, dtype, data_dir, max_chunk_size)
+            self.arrmap = am.arraymap(shape, dtype, data_dir, max_file_size)
         except Exception as e:
             print "Disk allocation failed.", e
             sys.exit(e)
@@ -50,38 +62,38 @@ class dbarray(object):
         return bounds
         # return self.read(arrslice)
 
-    def __setitem__(self, idx, ndview):
+    def __setitem__(self, idx, dbview):
         """
         Overload assignment indexing.
         """
         arrslice = indexing.index(self.shape, idx)
-        # view = ndview(ndview.asndarray(), ndview.dbarray, arrslice=arrslice)
+        # view = dbview(dbview.asndarray(), dbview.dbarray, arrslice=arrslice)
 
         # self.flush(view)
 
     def read(self, arrslice=None):
         """
-        Returns (in-memory) ndview object corresponding to dbarray[arrslice].
+        Returns (in-memory) dbview object corresponding to dbarray[arrslice].
         """
         # read data from disk contained in bounding indices
         flattened_bounds = indexing.dbindex.flattened_bounds(arrslice)
         shape = indexing.dbindex.shape(arrslice)
         data = self.am.pull(flattened_bounds, shape)
         
-        # create ndview
-        view = ndview(data, self, arrslice)
+        # create dbview
+        view = dbview(data, self, arrslice)
 
         return view
 
-    def flush(self, ndview):
+    def flush(self, dbview):
         """
-        Pushes data in ndview to dbarray on disk.
+        Pushes data in dbview to dbarray on disk.
         """
         # convert arrslice to flattened bounds
         # flattened_bounds = dbindex.flattened_bounds(arrslice, self)
 
         # map copies ndarray to disk
-        self.am.push(ndview)
+        self.am.push(dbview)
 
     def asndarray(self, copy):
         """
@@ -90,12 +102,12 @@ class dbarray(object):
         full_view = self.read()
         return full_view.asndarray(copy)
 
-class ndview(np.ndarray):
+class dbview(np.ndarray):
     def __new__(cls, data, dbarray, arrslice=None):
         """
         Describes a "view" into a subset of a dbarray. Inherits from np.ndarray; 
         additional parameters locate the view in containing dbarray. The position of
-        an ndview in a dbarray is described by its dbindex object arrslice.
+        an dbview in a dbarray is described by its dbindex object arrslice.
         """
         obj = np.asarray(data).view(cls)
         
@@ -125,8 +137,8 @@ class ndview(np.ndarray):
 
     def asndarray(self, copy=False):
         """
-        Casts ndview as an np.ndarray, obliterating arrslice context. If copy, data are copied and
-        pointer to new ndarray object is returned; otherwise, points to original ndview memory. 
+        Casts dbview as an np.ndarray, obliterating arrslice context. If copy, data are copied and
+        pointer to new ndarray object is returned; otherwise, points to original dbview memory. 
         """
         if copy:
             arr = np.array(self)
@@ -136,34 +148,34 @@ class ndview(np.ndarray):
         return arr 
 
     @staticmethod
-    def merge(ndviews, fill=0):
+    def merge(dbviews, fill=0):
         """
-        Uses ndview positions to merge multiple ndview objects into a single new ndview object.
+        Uses dbview positions to merge multiple dbview objects into a single new dbview object.
 
         TODO: fix merged_dims to account for parallel slices. Find bounding hypercube.
         """
-        # parent_ndim = ndviews[0].dbarray.ndim
+        # parent_ndim = dbviews[0].dbarray.ndim
 
-        # # check that all ndviews have same dtype
-        # dtypes = [view.dtype for view in ndviews]
-        # assert(all(dtypes[0] == dtype for dtype in dtypes)), "All ndview dtypes must be equal"
+        # # check that all dbviews have same dtype
+        # dtypes = [view.dtype for view in dbviews]
+        # assert(all(dtypes[0] == dtype for dtype in dtypes)), "All dbview dtypes must be equal"
 
         # # calculate dims and offsets of merged array
-        # merged_dims = list(set(sorted(itertools.chain.from_iterable([view.dims for view in ndviews]))))
-        # offsets_by_dim = [[view.offset[dim] for view in ndviews] for dim in range(parent_ndim)]
-        # offsets_by_view = [[offsets[view_idx] for offsets in offsets_by_dim] for view_idx in range(len(ndviews))]
+        # merged_dims = list(set(sorted(itertools.chain.from_iterable([view.dims for view in dbviews]))))
+        # offsets_by_dim = [[view.offset[dim] for view in dbviews] for dim in range(parent_ndim)]
+        # offsets_by_view = [[offsets[view_idx] for offsets in offsets_by_dim] for view_idx in range(len(dbviews))]
         # merged_offset = [min(offsets) for offsets in offsets_by_dim]
 
         # # calculate position of merged view in dbarray
-        # length_by_view = [[view.shape[view.dims.index(dim)] if dim in view.dims else 1 for view in ndviews] for dim in range(parent_ndim)]
-        # upper_bounds = [max([view.offset[dim] + length_by_view[dim][view_idx] for view_idx, view in enumerate(ndviews)]) for dim in range(parent_ndim)]
+        # length_by_view = [[view.shape[view.dims.index(dim)] if dim in view.dims else 1 for view in dbviews] for dim in range(parent_ndim)]
+        # upper_bounds = [max([view.offset[dim] + length_by_view[dim][view_idx] for view_idx, view in enumerate(dbviews)]) for dim in range(parent_ndim)]
         # merged_bounds = zip(merged_offset, upper_bounds)
         # length_by_dim =  [u - l for l, u in merged_bounds] 
         # length_by_merged_dim = [l for l in length_by_dim if l != 1]
         # flattened = [l == 1 for l in length_by_dim]
         # flattened_dims = list(itertools.compress(range(parent_ndim), flattened))
 
-        # # create new empty ndview object
+        # # create new empty dbview object
         # if fill == 0:
         #     merged_arr = np.zeros(shape=length_by_merged_dim, dtype=dtypes[0])
         # elif fill == 1:
@@ -172,7 +184,7 @@ class ndview(np.ndarray):
         #     merged_arr = np.empty(shape=length_by_merged_dim, dtype=dtypes[0])
         #     merged_arr[:] = fill
 
-        # merged = ndview(merged_arr, ndviews[0].dbarray, dims=merged_dims, offset=merged_offset)
+        # merged = dbview(merged_arr, dbviews[0].dbarray, dims=merged_dims, offset=merged_offset)
         
         # print parent_ndim
         # print merged_dims
@@ -188,7 +200,7 @@ class ndview(np.ndarray):
         # print
         # print merged
 
-        # for view_idx, view in enumerate(ndviews): 
+        # for view_idx, view in enumerate(dbviews): 
         #     offset = offsets_by_view[view_idx]
         #     print "view_idx", view_idx
         #     print "dims", view.dims
@@ -204,12 +216,11 @@ class ndview(np.ndarray):
         # return merged
 
         # # find bounding hypercube: the size of merged array
-        # hypercube = _bounding_hypercube(ndviews)
+        # hypercube = _bounding_hypercube(dbviews)
 
         # # find offset of merged array relative to containing dbarray
         # merged_offset = 
-
-
+        
 
 db = dbarray((3,3,3), float)
 bounds = db[0:3]
@@ -232,14 +243,14 @@ print "bounds", bounds
 bounds = db[...,1]
 print "bounds", bounds
 
-# a = ndview(np.zeros(shape=(3,3)), db, dims=(0,1), offset=(0,0,0))
-# b = ndview(np.ones(shape=(2,2)), db, dims=(0,1), offset=(1,0,0))
-# c = ndview([[3,1],[1,5],[2,3]], offset=(1,2))
-# d = ndview([[3,1],[1,5]], offset=(6,9))
+# a = dbview(np.zeros(shape=(3,3)), db, dims=(0,1), offset=(0,0,0))
+# b = dbview(np.ones(shape=(2,2)), db, dims=(0,1), offset=(1,0,0))
+# c = dbview([[3,1],[1,5],[2,3]], offset=(1,2))
+# d = dbview([[3,1],[1,5]], offset=(6,9))
 # print a
 # print b
 
-# print ndview.merge([a,b], fill=2)
+# print dbview.merge([a,b], fill=2)
 
 # c = a.asndarray(copy=True)
 # c[0,0] = 100

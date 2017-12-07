@@ -1,17 +1,19 @@
-## IN DEV
+# IN DEV
 TODO: 
 ---infrastruture---
+imports into top namespace
 testing
 Sphinx
 packaging
 
 ---core content---
-starndardize terminology for sliceing/indexing, rename instances, attributes
-rewrite arraymap, indexing in Cython?
-free dbarray? need to save explicitly, or paramater for persistence?
-Keep track of what's in memory to avoid repetitive pulls
-Combine flattened bounds
-Don't create dbindex objects?
+creation
+* basic - npdb.empty()
+* from data - npdb.array()
+rewrite arraymap and indexing in Cython/C/numpy?
+free dbarray? parameter to save explicitly, or paramater for persistence?
+keep track of what's in memory to avoid repetitive pulls
+compression
 
 # npdb
 

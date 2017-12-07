@@ -13,7 +13,7 @@ import numpy as np
 def index(db_shape, raw_idx):
     """
     Converts a raw bracked index expression to the corresponding set of dbarray
-    bounds and the shape of the resulting indexed array; i.e., performs 
+    index bounds and the shape of the resulting indexed array; i.e., performs 
     dbarray[raw_idx] where dbarray has shape db_shape.
 
     Supported raw_idx types are int, slice, tuple, np.ellipsis, np.newaxis, int 
@@ -28,9 +28,10 @@ def index(db_shape, raw_idx):
         raw_idx (one of supported raw index types): indices to retrieve or set
 
     Returns:
-        bounds (list): a list of tuples of index boubds for each C-contiguous 
-        block of data in dbarray[raw_idx]. Each tuple (start, stop) indicates 
-        the index of the first and last elements of the contigous block.
+        index_bounds (list): a list of tuples of index bounds for each maximal
+        C-contiguous block of data in dbarray[raw_idx]. Each tuple (start, stop)
+        indicates the index of the first and last elements of the contigous 
+        block.
         indexed_shape (tuple): the shape of dbarray[raw_idx]
     """    
     # first format index and determine the type of index
@@ -38,12 +39,14 @@ def index(db_shape, raw_idx):
 
     if idx_type == "basic":
         # basic indexing
-        bounds = simple_index(db_shape, idx)
+        indexed_shape, index_bounds = simple_index(db_shape, idx)
     else:
         # fancy indexing
-        bounds = fancy_index(db_shape, idx)
+        indexed_shape, index_bounds = fancy_index(db_shape, idx)
 
-    return bounds
+    maximal_index_bounds = merge_contiguous(index_bounds)
+
+    return indexed_shape, maximal_index_bounds
     
 def to_dbindex(raw_idx):
     """
@@ -95,6 +98,41 @@ def to_dbindex(raw_idx):
 
     return idx, idx_type
 
+def merge_contiguous(index_bounds):
+    """
+    Combines any contiguous index bounds.
+
+    Args:
+        index_bounds (list): a list of bounding index tuples for each 
+        potentially non-maximal C-contiguous block of data selected.
+
+    Returns:
+        maximal_index_bounds (list): a list of bounds equivalent to
+        index_bounds, but such that each bounded area is maximal, i.e., no
+        pairs of consecutive bounds can be merged to form a single bounds. 
+    """
+    # combine any contiguous index bounds
+    maximal_index_bounds = []
+
+    # for the first element compare the consecutive bounds in index_bounds
+    if index_bounds[0][1] != index_bounds[1][0]:
+        # not contiguous
+        maximal_index_bounds += [index_bounds[0], index_bounds[1]]
+    else:
+        # contiguous
+        maximal_index_bounds.append((index_bounds[0][0], index_bounds[1][1]))
+    for i in range(1, len(index_bounds) - 1):
+        # compare to last element of maximal_index_bounds
+        if maximal_index_bounds[-1][1] != index_bounds[i+1][0]:
+            # not contiguous
+            maximal_index_bounds.append(index_bounds[i+1])
+        else:
+            # contiguous
+            last_bounds = maximal_index_bounds.pop()
+            maximal_index_bounds.append((last_bounds[0], index_bounds[i+1][1]))
+
+    return maximal_index_bounds
+
 def positivize_idx(axis_len, idx_1d):
     """
     Standardizes a 1d index by converting a negative scalar to a
@@ -131,14 +169,14 @@ def simple_index(db_shape, idx):
         idx (one of supported_index_types): an index of a dbarray
 
     Returns:
-        bounds (list): a list of bounding index tuples for each C-contiguous 
-        block of data in the indexed result. 
         indexed_shape (tuple): the shape of dbarray[raw_idx]
+        index_bounds (list): a list of bounding index tuples for each 
+        C-contiguous block of data in the indexed result. 
     """
     # number of dimensions to slice in
     ndim = len(db_shape)
 
-    bounds = []
+    index_bounds = []
     if type(idx) is int:
         # indexing by a scalar
         idx = positivize_idx(db_shape[0], idx)
@@ -175,10 +213,10 @@ def simple_index(db_shape, idx):
                     # subselection along first axis; slice non-contiguous
                     step = idx.step if not idx.step is None else 1
                     first_axis_idxs = range(start, stop, step)
-                    bounds = []
+                    index_bounds = []
                     for first_idx in first_axis_idxs:
-                        bounds += [((first_idx,), (first_idx,))]
-                    return bounds
+                        index_bounds += [((first_idx,), (first_idx,))]
+                    return index_bounds
             else:
                 # slice along first axis, full slice from higher axes
                 sub_idx = to_dbindex(slice(None))[0]
@@ -198,7 +236,7 @@ def simple_index(db_shape, idx):
                             end_idx in sub_bounds]
                 else:
                     # subselection along first axis
-                    bounds = []
+                    index_bounds = []
                     start = idx.start if not idx.start is None else 0
                     stop = idx.stop if not idx.stop is None else db_shape[0]
                     step = idx.step if not idx.step is None else 1
@@ -206,10 +244,10 @@ def simple_index(db_shape, idx):
                     stop = positivize_idx(db_shape[0], stop)
                     first_axis_idxs = range(start, stop, step)
                     for first_idx in first_axis_idxs:
-                        bounds += [((first_idx,) + start_idx, (first_idx,) + 
+                        index_bounds += [((first_idx,) + start_idx, (first_idx,) + 
                                    end_idx) for start_idx, end_idx in 
                                    sub_bounds]
-                    return bounds
+                    return index_bounds
 
     else:
         # indexing by a tuple
@@ -232,12 +270,12 @@ def simple_index(db_shape, idx):
             sub_shape = db_shape[1:]
             sub_bounds = simple_index(sub_shape, to_dbindex(sub_idx)[0])
             # combine first axis bounds with subaxis bounds
-            bounds = []
+            index_bounds = []
             for first_axis_start, first_axis_stop in first_axis_idxs:
-                bounds += [(first_axis_start + sub_axis_start, first_axis_stop +
-                           sub_axis_stop) for sub_axis_start, sub_axis_stop in 
-                           sub_bounds]
-            return bounds
+                index_bounds += [(first_axis_start + sub_axis_start, 
+                           first_axis_stop + sub_axis_stop) for sub_axis_start,
+                           sub_axis_stop in sub_bounds]
+            return index_bounds
 
 def fancy_index(db_shape, idx):
     """
