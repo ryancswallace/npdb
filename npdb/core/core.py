@@ -5,14 +5,13 @@ Contains the two core npdb classes:
     of a dbarray
 """
 
-import sys
 import operator
 import itertools
 
 import numpy as np
 
-# from indexing import indexing
-import arraymap as am
+import npdb
+from npdb.core.diskmap import arraymap
 
 class dbarray(object):
     """
@@ -40,10 +39,10 @@ class dbarray(object):
 
         # allocate disk space and map array contents to disk space 
         try: 
-            self.arrmap = am.arraymap(shape, dtype, byteorder, order, data_dir, max_file_size)
+            self.arrmap = arraymap(shape, dtype, byteorder, order, data_dir, 
+                                   max_file_size)
         except Exception as e:
-            print "Disk allocation failed.", e
-            sys.exit(e)
+            raise RuntimeError, "Disk allocation failed. {}".format(e)
 
     def __repr__(self):
         pass
@@ -77,7 +76,7 @@ class dbarray(object):
         """
         # read data from disk contained in bounding indices
         index_bounds, indexed_shape = indexing.unravel_index(self.shape, idx)
-        data = self.am.pull(index_bounds, indexed_shape)
+        data = self.arrmap.pull(index_bounds, indexed_shape)
         
         # create dbview
         view = dbview(data, self, arrslice)
@@ -92,7 +91,7 @@ class dbarray(object):
         # flattened_bounds = dbindex.flattened_bounds(arrslice, self)
 
         # map copies ndarray to disk
-        self.am.push(dbview)
+        self.arrmap.push(dbview)
 
     def asndarray(self, copy):
         """

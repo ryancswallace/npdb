@@ -2,8 +2,8 @@
 __init__ file for npdb package.
 
 Three functions:
-	1) Explaines __all__ variable.
-	2) Imports third-party packages used throughout.
+	1) Explains omission of __all__ variable.
+	2) Configures user parameters.
 	3) Imports user API into npdb namespace.
 """
 ###############
@@ -14,26 +14,33 @@ Three functions:
 # potential conflicts, npdb should be imported as "import npdb", or if brevity
 # is important, as "import npdb as nd"
 
-############################
-### third-party packages ###
-############################
-import numpy as np
+###############################
+### Parameter configuration ### 
+###############################
+# TODO: work this out
+# from npdb.core import config 
+
+# def get_def_max_file_size():
+# 	return config.MAX_FILE_SIZE
+
+# def get_def_max_view_size():
+# 	return config.MAX_VIEW_SIZE
 
 ################
 ### User API ###
 ################
 ### core modules and classes
-import npdb.core
-import npdb.creation
-import npdb.indexing
-import npdb.linalg
-import npdb.math
-import npdb.random
-import npdb.sorting
-import npdb.statistics
+from npdb import core
+from npdb import creation
+from npdb import indexing
+from npdb import linalg
+from npdb import math
+from npdb import random
+from npdb import sorting
+from npdb import statistics
 
-from npdb.core import npdb
-from npdb.core.npdb import dbarray
+from npdb.core.core import dbarray
+from npdb.core.core import dbview
 
 #### array creation routines
 # from npdb.creation.basic import empty
@@ -106,5 +113,5 @@ from npdb.core.npdb import dbarray
 # from npdb.manipulation.rearrange import rot90
 
 ### indexing 
-from npdb.indexing import indexing
+# from npdb.indexing import indexing
 

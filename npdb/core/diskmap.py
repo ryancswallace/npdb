@@ -4,6 +4,8 @@ Implements a memory map of a dbarray on disk.
 
 import os
 import math
+import string
+import random
 import operator
 
 import numpy as np
@@ -32,7 +34,8 @@ class arraymap(object):
         self.row_major = row_major
 
         # maximum file size
-        self.max_file_size = max_file_size
+        self.max_file_size = (max_file_size if not max_file_size is None else
+                              1024 ** 2)
 
         # create directory and file structure
         self.file_paths, self.bytes_per_file, self.array_dir_name = (
@@ -72,7 +75,7 @@ class arraymap(object):
             array_dir = os.path.join(data_dir, array_dir_name)
 
         total_bytes = size * itemsize
-        n_files = math.ceil(total_bytes / float(max_file_size))
+        n_files = int(math.ceil(total_bytes / float(max_file_size)))
         even_bpf = total_bytes / float(n_files)
 
         if even_bpf < 1:
