@@ -27,7 +27,6 @@ class arraymap(object):
 
         # data elements
         self.dtype = np.dtype(dtype)
-        self.itemsize = self.dtype.itemsize
 
         # data layout
         self.byteorder = byteorder
@@ -39,7 +38,7 @@ class arraymap(object):
 
         # create directory and file structure
         self.file_paths, self.bytes_per_file, self.array_dir_name = (
-            self.setup_dirs(data_dir, self.size, self.itemsize, 
+            self.setup_dirs(data_dir, self.size, self.dtype.itemsize, 
                             self.max_file_size))
         self.n_files = len(self.file_paths)
 
@@ -118,7 +117,7 @@ class arraymap(object):
         
         # calculate item number in C-contiguous order
         item_num = np.dot(np.array(axis_mults), np.array(index))
-        total_byte_offset = self.itemsize * item_num
+        total_byte_offset = self.dtype.itemsize * item_num
 
         # determine file number and offset within file
         if self.n_files == 1:

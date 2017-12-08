@@ -64,24 +64,24 @@ def to_dbindex(raw_idx):
     dbindex_types = [int, slice, tuple, type(Ellipsis), type(None), np.ndarray]
 
     # coerce array-likes into np.ndarrays and check that arrays are of bools 
-    # or ints
-    if not type(raw_idx) in dbindex_types:
+    # or ints 
+    if not any([isinstance(raw_idx, t) for t in dbindex_types]):
         # try to cast np.ndarray
         try:
             raw_idx = np.array(raw_idx)
         except Exception:
             raise TypeError, "dbarray index of unsupported type"
 
-    if type(raw_idx) is np.ndarray:
+    if isinstance(raw_idx, np.ndarray):
         # array index must be of integers or bools
-        assert(raw_idx_formatted.dtype in [int, bool])
+        assert(raw_idx.dtype in [int, bool])
 
     array_in_tuple = False
-    if type(raw_idx) is tuple:
+    if isinstance(raw_idx, tuple):
         raw_idx_list = list(raw_idx)
         # any tuple elements that are array-like must be of ints or bools
         for e_idx, e in enumerate(raw_idx):
-            if not type(e) in dbindex_types:
+            if not any([isinstance(e, t) for t in dbindex_types]):
                 # either array-like
                 try:
                     raw_idx_list[e_idx] = np.array(e)
@@ -94,9 +94,9 @@ def to_dbindex(raw_idx):
     idx = raw_idx
 
     # determine indexing type
-    idx_type = "fancy" if type(idx) is np.ndarray or array_in_tuple else "basic"
-    assert(type(idx) in dbindex_types), "Error in index formatting"
-
+    idx_type = "fancy" if isinstance(idx, np.ndarray) or array_in_tuple else "basic"
+    assert(any([isinstance(idx, t) for t in dbindex_types])), "Error in index formatting"
+ 
     return idx, idx_type
 
 def merge_contiguous(index_bounds):
@@ -139,7 +139,7 @@ def positivize_idx(axis_len, idx_1d):
     Standardizes a 1d index by converting a negative scalar to a
     corresponding positive scalar. Also checks bounds.
     """ 
-    if type(idx_1d) is int:
+    if isinstance(idx_1d, tuple):
         # numerical index
         if idx_1d < 0:
             # convert to positive index
@@ -178,7 +178,7 @@ def simple_index(db_shape, idx):
     ndim = len(db_shape)
 
     index_bounds = []
-    if type(idx) is int:
+    if isinstance(idx, int):
         # indexing by a scalar
         idx = positivize_idx(db_shape[0], idx)
         if ndim == 1:
@@ -195,7 +195,7 @@ def simple_index(db_shape, idx):
             return [((idx,) + start_idx, (idx,) + end_idx) for
                     start_idx, end_idx in sub_bounds]
 
-    elif type(idx) is slice:
+    elif isinstance(idx, slice):
         # parse slice values to scalars
         if idx == slice(None):
             # select all

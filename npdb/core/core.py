@@ -21,20 +21,26 @@ class dbarray(object):
     def __init__(self, shape, dtype, byteorder="big_endian", 
                  order="C", data_dir=None, max_file_size=None):
         # size attributes
-        if type(shape) is int:
+        if shape is None:
+            self.shape = ()
+        elif isinstance(shape, int):
             # convert to length 1 tuple
             self.shape = (shape,)
         else:
             self.shape = tuple(shape)
+        assert(all([s >= 0 for s in self.shape]))
+
         self.size = reduce(operator.mul, self.shape)
         self.ndim = len(shape)
 
+        # items
         self.dtype = np.dtype(dtype)
-        self.itemsize = self.dtype.itemsize
 
+        # memory layout
         self.byteorder = byteorder
         self.order = order
 
+        # maximum allowed file size in bytes
         self.max_file_size = max_file_size
 
         # allocate disk space and map array contents to disk space 
@@ -45,30 +51,38 @@ class dbarray(object):
             raise RuntimeError, "Disk allocation failed. {}".format(e)
 
     def __repr__(self):
-        pass
+        return "{} dbarray of {}".format(self.shape, self.dtype, 
+                                         self.arrmap.array_dir_name)
 
     def __len__(self):
         """
-        Following NumPy convention, len(dbarray) is the size of the first dimension.
+        Following NumPy convention, len(dbarray) is the size of the first
+        dimension.
         """
         return self.shape[0]
 
     def __getitem__(self, idx):
         """
-        Overload access indexing.
+        Overloads access indexing.
         """
-        bounds = indexing.unravel_index(self.shape, idx)
+        bounds = npdb.indexing.unravel_index(self.shape, idx)
         return bounds
         # return self.read(arrslice)
 
     def __setitem__(self, idx, dbview):
         """
-        Overload assignment indexing.
+        Overloads assignment indexing.
         """
-        arrslice = indexing.unravel_index(self.shape, idx)
+        arrslice = npdb.indexing.unravel_index(self.shape, idx)
         # view = dbview(dbview.asndarray(), dbview.dbarray, arrslice=arrslice)
 
         # self.flush(view)
+
+    def __del__(self):
+        """
+        Overloads del keyword. 
+        """
+        pass
 
     def read(self, arrslice=None):
         """

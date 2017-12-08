@@ -2,17 +2,17 @@
 TODO: 
 
 ---infrastruture---
-* tests
 * Sphinx
 * PyPi - http://peterdowns.com/posts/first-time-with-pypi.html
 
 
 ---core content---
-* default size params, data dir
+* indexing location, module names?
 * creation: basic - npdb.empty(), from data - npdb.array()
-* rewrite arraymap and indexing in Cython/C/numpy?
-* free dbarray? parameter to save explicitly, or paramater for persistence?
+* free dbarray? parameter to save explicitly, or paramater for persistence? overload del
 * keep track of what's in memory to avoid repetitive pulls
+* default size params, data dir
+* rewrite arraymap and indexing in Cython/C/numpy?
 * compression
 
 # npdb

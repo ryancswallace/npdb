@@ -42,6 +42,8 @@ from npdb import statistics
 from npdb.core.core import dbarray
 from npdb.core.core import dbview
 
+from npdb.indexing import indexing
+
 #### array creation routines
 # from npdb.creation.basic import empty
 # from npdb.creation.basic import empty_like
@@ -112,6 +114,4 @@ from npdb.core.core import dbview
 # from npdb.manipulation.rearrange import roll
 # from npdb.manipulation.rearrange import rot90
 
-### indexing 
-# from npdb.indexing import indexing
-
+### indexing
