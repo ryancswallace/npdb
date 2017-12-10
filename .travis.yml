@@ -10,4 +10,5 @@ install:
 script:
   - python -m unittest discover
 after_success:
-  - codecov --token=c5fbcba0-291c-465a-9959-1f1e33399fb1
+  # - codecov --token=c5fbcba0-291c-465a-9959-1f1e33399fb1
+  - bash <(curl -s https://codecov.io/bash) -t c5fbcba0-291c-465a-9959-1f1e33399fb1
