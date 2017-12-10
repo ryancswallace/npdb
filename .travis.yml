@@ -12,3 +12,4 @@ script:
   - bash <(coverage run -m unittest discover)
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t c5fbcba0-291c-465a-9959-1f1e33399fb1
+
