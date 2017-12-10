@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/ryancwallace/npdb.svg?branch=master)](https://travis-ci.org/ryancwallace/npdb)
 [![codecov](https://codecov.io/gh/ryancwallace/npdb/branch/master/graph/badge.svg)](https://codecov.io/gh/ryancwallace/npdb)
+[![Documentation Status](https://readthedocs.org/projects/npdb/badge/?version=latest)](http://npdb.readthedocs.io/en/latest/?badge=latest)
 
 npdb is an implementation of large disk-stored NumPy-compatible n-dimenstional arrays that may exceed available memory. npdb implements the core multi-dimensional array class `npdb.dbarray`, which supports persistent binary storage and distributed batch processed operations. `npdb.dbarray` supports a subset of the `numpy.ndarray` interface.
 
@@ -48,7 +49,6 @@ Ryan Wallace. ryanwallace@college.harvard.edu.
 TODO: 
 
 ---infrastruture---
-* auto doc from git
 * autodoc for reference 
 * host
 * link examples, install guide, docs, tutorial
