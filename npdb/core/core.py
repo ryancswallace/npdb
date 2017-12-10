@@ -5,6 +5,7 @@ Contains the two core npdb classes:
     of a dbarray
 """
 
+import os
 import operator
 import itertools
 
@@ -18,8 +19,11 @@ class dbarray(object):
     Implements a ndarray-like object with data stored on disk, not memory. Data
     size is only constrained by available space on disk.
     """
-    def __init__(self, shape, dtype, byteorder="big_endian", 
+    def __init__(self, shape, dtype, buff=None, offset=None, strides=None,
                  order="C", data_dir=None, max_file_size=None):
+        # items
+        self.dtype = np.dtype(dtype)
+
         # size attributes
         if shape is None:
             self.shape = ()
@@ -33,22 +37,26 @@ class dbarray(object):
         self.size = reduce(operator.mul, self.shape)
         self.ndim = len(shape)
 
-        # items
-        self.dtype = np.dtype(dtype)
-
-        # memory layout
-        self.byteorder = byteorder
-        self.order = order
+        # calculate disk C-contiguous strides; data always stored C-contiguous
+        strides = [1] * self.ndim
+        for axis in range(self.ndim - 1):
+            strides[axis + 1] = strides[axis] * self.shape[axis]
+        self.strides = reversed(strides)
 
         # maximum allowed file size in bytes
         self.max_file_size = max_file_size
 
         # allocate disk space and map array contents to disk space 
         try: 
-            self.arrmap = arraymap(shape, dtype, byteorder, order, data_dir, 
+            self.arrmap = arraymap(shape, dtype, strides, data_dir,
                                    max_file_size)
         except Exception as e:
             raise RuntimeError, "Disk allocation failed. {}".format(e)
+
+        # write data to disk 
+        if not buff is None:
+            arr = np.ndarray(shape, dtype, buff, offset, strides, order)
+            self.write(arr, raw_idx=None)
 
     def __repr__(self):
         return "{} dbarray of {}".format(self.shape, self.dtype, 
@@ -61,51 +69,47 @@ class dbarray(object):
         """
         return self.shape[0]
 
-    def __getitem__(self, idx):
+    def __getitem__(self, raw_idx):
         """
         Overloads access indexing.
         """
-        bounds = npdb.indexing.unravel_index(self.shape, idx)
-        return bounds
-        # return self.read(arrslice)
+        return self.read(raw_idx)
 
-    def __setitem__(self, idx, dbview):
+    def __setitem__(self, raw_idx, arr):
         """
         Overloads assignment indexing.
         """
-        arrslice = npdb.indexing.unravel_index(self.shape, idx)
-        # view = dbview(dbview.asndarray(), dbview.dbarray, arrslice=arrslice)
+        self.write(arr, raw_idx)
 
-        # self.flush(view)
-
-    def __del__(self):
+    def __del__(self, arr):
         """
         Overloads del keyword. 
         """
-        pass
+        # delete files on disk
+        print "IN del", arr
+        os.removedirs(arr.dir_name)
 
-    def read(self, arrslice=None):
+    def read(self, raw_idx=None):
         """
-        Returns (in-memory) dbview object corresponding to dbarray[arrslice].
+        Returns (in-memory) dbview object corresponding to dbarray[raw_idx].
         """
         # read data from disk contained in bounding indices
-        index_bounds, indexed_shape = indexing.unravel_index(self.shape, idx)
+        indexed_shape, index_bounds = indexing.unravel_index(self.shape, raw_idx)
         data = self.arrmap.pull(index_bounds, indexed_shape)
         
         # create dbview
-        view = dbview(data, self, arrslice)
+        view = dbview(data, self, index_bounds)
 
         return view
 
-    def flush(self, dbview):
+    def write(self, arr, raw_idx=None):
         """
-        Pushes data in dbview to dbarray on disk.
+        Pushes data in arr to dbarray on disk.
         """
-        # convert arrslice to flattened bounds
-        # flattened_bounds = dbindex.flattened_bounds(arrslice, self)
-
-        # map copies ndarray to disk
-        self.arrmap.push(dbview)
+        # find bounding indices and push between them
+        indexed_shape, index_bounds = npdb.indexing.unravel_index(self.shape, 
+                                                                  raw_idx)
+        self.arrmap.push(index_bounds, arr)
 
     def asndarray(self, copy):
         """

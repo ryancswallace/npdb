@@ -40,14 +40,15 @@ def unravel_index(db_shape, raw_idx):
 
     if idx_type == "basic":
         # basic indexing
-        indexed_shape, index_bounds = simple_index(db_shape, idx)
+        index_bounds = simple_index(db_shape, idx)
     else:
         # fancy indexing
         indexed_shape, index_bounds = fancy_index(db_shape, idx)
 
     maximal_index_bounds = merge_contiguous(index_bounds)
 
-    return indexed_shape, maximal_index_bounds
+    # TODO: replace
+    return (3,3,3), maximal_index_bounds
     
 def to_dbindex(raw_idx):
     """
@@ -115,22 +116,28 @@ def merge_contiguous(index_bounds):
     # combine any contiguous index bounds
     maximal_index_bounds = []
 
-    # for the first element compare the consecutive bounds in index_bounds
-    if index_bounds[0][1] != index_bounds[1][0]:
-        # not contiguous
-        maximal_index_bounds += [index_bounds[0], index_bounds[1]]
+    if len(index_bounds) < 2:
+        # nothing to merge
+        return index_bounds
     else:
-        # contiguous
-        maximal_index_bounds.append((index_bounds[0][0], index_bounds[1][1]))
-    for i in range(1, len(index_bounds) - 1):
-        # compare to last element of maximal_index_bounds
-        if maximal_index_bounds[-1][1] != index_bounds[i+1][0]:
+        # for the first element compare the consecutive bounds in index_bounds
+        if index_bounds[0][1] != index_bounds[1][0]:
             # not contiguous
-            maximal_index_bounds.append(index_bounds[i+1])
+            maximal_index_bounds += [index_bounds[0], index_bounds[1]]
         else:
             # contiguous
-            last_bounds = maximal_index_bounds.pop()
-            maximal_index_bounds.append((last_bounds[0], index_bounds[i+1][1]))
+            maximal_index_bounds.append((index_bounds[0][0], 
+                                         index_bounds[1][1]))
+        for i in range(1, len(index_bounds) - 1):
+            # compare to last element of maximal_index_bounds
+            if maximal_index_bounds[-1][1] != index_bounds[i+1][0]:
+                # not contiguous
+                maximal_index_bounds.append(index_bounds[i+1])
+            else:
+                # contiguous
+                last_bounds = maximal_index_bounds.pop()
+                maximal_index_bounds.append((last_bounds[0], 
+                                             index_bounds[i+1][1]))
 
     return maximal_index_bounds
 
