@@ -8,6 +8,6 @@ install:
   - pip install -r docs/requirements.txt
 # command to run tests
 script:
-  - python -m unittest discover --cov=codecov
+  - python -m unittest discover
 after_success:
-  - codecov
+  - codecov --token=c5fbcba0-291c-465a-9959-1f1e33399fb1
