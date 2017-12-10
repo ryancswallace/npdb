@@ -48,7 +48,6 @@ Ryan Wallace. ryanwallace@college.harvard.edu.
 TODO: 
 
 ---infrastruture---
-* coverage test updates
 * Sphinx
 * Read the Docs sight
 * link examples, install guide, docs, tutorial

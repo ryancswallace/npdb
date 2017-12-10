@@ -1,22 +1,27 @@
-.. npdb documentation master file, created by
-   sphinx-quickstart on Mon Dec  4 11:11:03 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+=====================================
+npdb: Large Parallelized NumPy Arrays
+=====================================
 
-Welcome to npdb's documentation!
-================================
+This is the `npdb <https://github.com/ryancwallace/npdb>`_ documentation.
 
-Contents:
+.. module:: npdb
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Introduction
 
+   overview
+   tutorial
 
+.. toctree::
+   :maxdepth: 1
+   :caption: API Documentation
+   
+   reference/index
 
-Indices and tables
-==================
+.. toctree::
+   :maxdepth: 1
+   :caption: Miscellaneous
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   install
+   license
