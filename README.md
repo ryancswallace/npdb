@@ -20,6 +20,8 @@ TODO:
 
 # npdb
 
+[![Coveralls github](https://img.shields.io/coveralls/github/jekyll/jekyll.svg)]()
+
 npdb is an implementation of large disk-stored NumPy-compatible n-dimenstional arrays that may exceed available memory. npdb implements the core multi-dimensional array class `npdb.dbarray`, which supports persistent binary storage and distributed batch processed operations. `npdb.dbarray` supports a subset of the `numpy.ndarray` interface.
 
 ## Background
