@@ -1,4 +1,4 @@
-# npdb
+# npdb: Large Parallelized NumPy Arrays
 [![PyPI version](https://badge.fury.io/py/npdb.svg)](https://badge.fury.io/py/npdb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/ryancwallace/npdb.svg?branch=master)](https://travis-ci.org/ryancwallace/npdb)
