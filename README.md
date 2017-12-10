@@ -48,8 +48,7 @@ Ryan Wallace. ryanwallace@college.harvard.edu.
 TODO: 
 
 ---infrastruture---
-* Sphinx
-* Read the Docs sight
+* autodoc for reference; host
 * link examples, install guide, docs, tutorial
 
 ---core content---

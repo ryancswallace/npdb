@@ -7,8 +7,8 @@ Reference Manual
 This is the official npdb API reference manual. npdb supports a NumPy-like interface for parallelized operations on n-dimensional arrays on disk.
 
 
-Indices and tables
-==================
+Code Index
+==========
 
 * :ref:`genindex`
 
@@ -21,3 +21,4 @@ Reference
    :maxdepth: 2
 
    dbarray
+   

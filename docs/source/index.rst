@@ -2,7 +2,7 @@
 npdb: Large Parallelized NumPy Arrays
 =====================================
 
-This is the `npdb <https://github.com/ryancwallace/npdb>`_ documentation.
+This is the official `npdb <https://github.com/ryancwallace/npdb>`_ documentation.
 
 .. module:: npdb
 

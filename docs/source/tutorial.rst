@@ -1,4 +1,4 @@
-.. _tutorial:
+.. _overview:
 
 Basics of npdb
 ==============
