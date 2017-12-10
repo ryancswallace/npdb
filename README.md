@@ -3,10 +3,11 @@ TODO:
 
 ---infrastruture---
 * Sphinx
-* PyPi - http://peterdowns.com/posts/first-time-with-pypi.html
+* cool little bars on git
 
 
 ---core content---
+* set minimum size before spill over onto disk
 * better handling of open(file) re exceptions,  remove file on delete
 * magic methods 
 * indexing location, module names?
