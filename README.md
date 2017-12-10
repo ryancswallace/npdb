@@ -1,23 +1,3 @@
-# IN DEV
-TODO: 
-
----infrastruture---
-* Sphinx
-* cool little bars on git
-
-
----core content---
-* set minimum size before spill over onto disk
-* better handling of open(file) re exceptions,  remove file on delete
-* magic methods 
-* indexing location, module names?
-* creation: basic - npdb.empty(), from data - npdb.array()
-* free dbarray? parameter to save explicitly, or paramater for persistence? overload del
-* keep track of what's in memory to avoid repetitive pulls
-* default size params, data dir
-* rewrite arraymap and indexing in Cython/C/numpy?
-* compression
-
 # npdb
 [![PyPI version](https://badge.fury.io/py/npdb.svg)](https://badge.fury.io/py/npdb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -62,3 +42,23 @@ MIT License (see `LICENSE`). Copyright (c) 2017 Ryan Wallace.
 
 ## Authors
 Ryan Wallace. ryanwallace@college.harvard.edu.
+
+
+# IN DEV
+TODO: 
+
+---infrastruture---
+* Sphinx
+* coverage tests
+
+---core content---
+* set minimum size before spill over onto disk
+* better handling of open(file) re exceptions,  remove file on delete
+* magic methods 
+* indexing location, module names?
+* creation: basic - npdb.empty(), from data - npdb.array()
+* free dbarray? parameter to save explicitly, or paramater for persistence? overload del
+* keep track of what's in memory to avoid repetitive pulls
+* default size params, data dir
+* rewrite arraymap and indexing in Cython/C/numpy?
+* compression
