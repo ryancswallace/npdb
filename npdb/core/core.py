@@ -16,8 +16,19 @@ from npdb.core.diskmap import arraymap
 
 class dbarray(object):
     """
-    Implements a ndarray-like object with data stored on disk, not memory. Data
-    size is only constrained by available space on disk.
+    Implements a ndarray-like object with data stored on disk, not memory.
+    
+    Data size is only constrained by available space on disk.
+
+    Args:
+        shape (tuple): shape of dbarray.
+        dtype (one of supported raw index types): data type of elements.
+        buff (buffer): data buffer to populate the array.
+        offset (int): start of data offset in buffer.
+        strides (tuple): strides along each axis.
+        order (str): C- ("C") or Fortran- ("F") contiguous.
+        data_dir (str): directory to locate array storage.
+        max_file_size (int): imposes maximum byte size of individual data files.
     """
     def __init__(self, shape, dtype, buff=None, offset=None, strides=None,
                  order="C", data_dir=None, max_file_size=None):

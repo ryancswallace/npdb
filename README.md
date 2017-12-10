@@ -48,7 +48,9 @@ Ryan Wallace. ryanwallace@college.harvard.edu.
 TODO: 
 
 ---infrastruture---
-* autodoc for reference; host
+* auto doc from git
+* autodoc for reference 
+* host
 * link examples, install guide, docs, tutorial
 
 ---core content---

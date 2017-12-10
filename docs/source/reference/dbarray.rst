@@ -8,3 +8,4 @@ Multi-Dimensional Array (dbarray)
    :nosignatures:
 
    npdb.dbarray
+   

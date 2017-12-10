@@ -25,7 +25,7 @@ def unravel_index(db_shape, raw_idx):
     Numpy field access (and structured arrays generally) is not supported.
 
     Args:
-        db_shape (tuple): shape of bdarray being indexed.
+        db_shape (tuple): shape of dbarray being indexed.
         raw_idx (one of supported raw index types): indices to retrieve or set
 
     Returns:
