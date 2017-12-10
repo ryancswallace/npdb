@@ -5,6 +5,11 @@
 [![codecov](https://codecov.io/gh/ryancwallace/npdb/branch/master/graph/badge.svg)](https://codecov.io/gh/ryancwallace/npdb)
 [![Documentation Status](https://readthedocs.org/projects/npdb/badge/?version=latest)](http://npdb.readthedocs.io/en/latest/?badge=latest)
 
+[**Docs**](https://npdb.readthedocs.io)
+| [**Install Guide**](https://http://npdb.readthedocs.io/en/stable/install)
+| [**Tutorial**](https://http://npdb.readthedocs.io/en/stable/tutorial)
+| [**Examples**](https://github.com/ryancwallace/npdb/tree/master/algs)
+
 npdb is an implementation of large disk-stored NumPy-compatible n-dimenstional arrays that may exceed available memory. npdb implements the core multi-dimensional array class `npdb.dbarray`, which supports persistent binary storage and distributed batch processed operations. `npdb.dbarray` supports a subset of the `numpy.ndarray` interface.
 
 ## Background
