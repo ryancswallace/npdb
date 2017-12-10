@@ -19,8 +19,8 @@ class TestDbarray(unittest.TestCase):
     def test_set(self):
         self.dbarr[:] = self.ndarr
 
-    def test_delete(self):
-        del self.dbarr
+    # def test_delete(self):
+    #     del self.dbarr
 
     @classmethod
     def tearDownClass(cls):
