@@ -94,7 +94,8 @@ class dbarray(object):
         Returns (in-memory) dbview object corresponding to dbarray[raw_idx].
         """
         # read data from disk contained in bounding indices
-        indexed_shape, index_bounds = indexing.unravel_index(self.shape, raw_idx)
+        indexed_shape, index_bounds = indexing.unravel_index(self.shape, 
+                                                             raw_idx)
         data = self.arrmap.pull(index_bounds, indexed_shape)
         
         # create dbview
@@ -122,8 +123,9 @@ class dbview(np.ndarray):
     def __new__(cls, data, dbarray, arrslice=None):
         """
         Describes a "view" into a subset of a dbarray. Inherits from np.ndarray; 
-        additional parameters locate the view in containing dbarray. The position of
-        an dbview in a dbarray is described by its dbindex object arrslice.
+        additional parameters locate the view in containing dbarray. The 
+        position of an dbview in a dbarray is described by its dbindex object 
+        arrslice.
         """
         obj = np.asarray(data).view(cls)
         
@@ -153,8 +155,9 @@ class dbview(np.ndarray):
 
     def asndarray(self, copy=False):
         """
-        Casts dbview as an np.ndarray, obliterating arrslice context. If copy, data are copied and
-        pointer to new ndarray object is returned; otherwise, points to original dbview memory. 
+        Casts dbview as an np.ndarray, obliterating arrslice context. If copy, 
+        data are copied and pointer to new ndarray object is returned; 
+        otherwise, points to original dbview memory. 
         """
         if copy:
             arr = np.array(self)
