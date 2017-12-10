@@ -49,7 +49,9 @@ TODO:
 
 ---infrastruture---
 * Sphinx
+* Docs sight, links
 * coverage tests
+* compy numpy, cupy
 
 ---core content---
 * set minimum size before spill over onto disk
