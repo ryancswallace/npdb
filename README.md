@@ -20,6 +20,7 @@ TODO:
 
 # npdb
 [![PyPI version](https://badge.fury.io/py/npdb.svg)](https://badge.fury.io/py/npdb)
+[![Build Status](https://travis-ci.org/ryancwallace/npdb.svg?branch=master)](https://travis-ci.org/ryancwallace/npdb)
 [![Coverage Status](https://coveralls.io/repos/github/ryancwallace/npdb/badge.svg?branch=master)](https://coveralls.io/github/ryancwallace/npdb?branch=master)
 
 npdb is an implementation of large disk-stored NumPy-compatible n-dimenstional arrays that may exceed available memory. npdb implements the core multi-dimensional array class `npdb.dbarray`, which supports persistent binary storage and distributed batch processed operations. `npdb.dbarray` supports a subset of the `numpy.ndarray` interface.
