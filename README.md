@@ -44,14 +44,14 @@ MIT License (see `LICENSE`). Copyright (c) 2017 Ryan Wallace.
 Ryan Wallace. ryanwallace@college.harvard.edu.
 
 
-# IN DEV
+# IN PRE-ALHPA DEV
 TODO: 
 
 ---infrastruture---
+* coverage test updates
 * Sphinx
-* Docs sight, links
-* coverage tests
-* compy numpy, cupy
+* Read the Docs sight
+* link examples, install guide, docs, tutorial
 
 ---core content---
 * set minimum size before spill over onto disk

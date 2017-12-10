@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = .
+source = npdb
 
 [report]
 exclude_lines =
