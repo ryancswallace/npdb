@@ -11,3 +11,4 @@ after_success:
   - codecov --token=c5fbcba0-291c-465a-9959-1f1e33399fb1
 notifications:
   email: false
+  
