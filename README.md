@@ -7,6 +7,8 @@ TODO:
 
 
 ---core content---
+* better handling of open(file) re exceptions,  remove file on delete
+* magic methods 
 * indexing location, module names?
 * creation: basic - npdb.empty(), from data - npdb.array()
 * free dbarray? parameter to save explicitly, or paramater for persistence? overload del
