@@ -13,11 +13,11 @@ class TestDbarray(unittest.TestCase):
     def test_size(self):
         self.assertEqual(self.dbarr.size, 27)
 
-    def test_len(self):
-        self.assertEqual(len(self.dbarr), 3)
+    # def test_len(self):
+    #     self.assertEqual(len(self.dbarr), 3)
 
-    def test_set(self):
-        self.dbarr[:] = self.ndarr
+    # def test_set(self):
+    #     self.dbarr[:] = self.ndarr
 
     # def test_delete(self):
     #     del self.dbarr
