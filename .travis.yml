@@ -7,6 +7,6 @@ install:
 # command to run tests
 script:
   - python -m unittest discover
-  - python coverage run tests/npdb_tests/core_tests/test_dbarray.py
+  - coverage run tests/npdb_tests/core_tests/test_dbarray.py
 after_success:
   - codecov
